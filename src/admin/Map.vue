@@ -14,10 +14,11 @@
 			</v-select>
 			</div>
 		</v-map-control>
-		<v-map-control class="ol-horizontal"
-			style="top: 8px;right: 50px;widt h:200px;">
+		<v-map-control class="ol-vertical"
+			style="top: 40px;right: 8px;widt h:200px;">
 	<v-button icon="fa-draw-polygon" v-on:click="fit(routeLayer)"/>
 <v-button icon="fa-car" v-on:click="fit(vehiclesLayer)"/>
+<v-button icon="fa-sync" v-on:click="vehicleInput"/>
 		</v-map-control>
 	</v-map>
 </template>

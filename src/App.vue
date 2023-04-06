@@ -192,7 +192,7 @@ export default ui({
             return me.makeGuess(timeout).then((location) => {
 				//mode 1=manual
                 location.mode=1;
-                me.postLocation(location,true);
+                me.postLocation(location,false);
                 return 1;
             });
         },
