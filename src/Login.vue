@@ -33,8 +33,8 @@
 					border-radius: 15px;
 					border-width: 0px;" v-on:click.prevent="login" value="INGRESAR" />
 				</div>
-				<a @click="$router.push('/shami/register')" style="margin-bottom: 10px">Registrate</a>
-				<a @click="$router.push('/shami/password')">&iquest;Olvidaste tu Contrase&ntilde;a?</a>
+				<a class="_" @click2="$router.push('/shami/register')" href="https://grupoipeys.com/wp-login.php?action=register" style="margin-bottom: 10px">Registrate</a>
+				<a class="_" @click2="$router.push('/shami/password')" href="https://grupoipeys.com/my-account/lost-password/">&iquest;Olvidaste tu Contrase&ntilde;a?</a>
 				<div class="center" style="margin-top: 20px;color: white;">BUILT ON: {{ app.BUILT_ON }}</div>
 			</div>
 		</form>

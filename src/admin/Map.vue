@@ -7,14 +7,17 @@
 <div class="v-form"> 
 			<label>Fecha:</label>
 			<v-calendar v-model="o.date" />
-			<label>Vehiculo:</label>
+			<label @dblclick="vehicleInput">Vehiculo:</label>
 			<v-select v-model="o.plate" @input="vehicleInput">
 				<option>--Seleccionar Opción--</option>
 				<v-options store="vehicle" displayField="plate"  valueField="plate"/>
 			</v-select>
 			</div>
-			<v-button icon="fa-car" @click="fit(vehicleLayer)"/>
-			<v-button icon="fa-sync" @click="vehicleInput"/>
+		</v-map-control>
+		<v-map-control class="ol-horizontal"
+			style="top: 8px;right: 50px;widt h:200px;">
+	<v-button icon="fa-draw-polygon" v-on:click="fit(routeLayer)"/>
+<v-button icon="fa-car" v-on:click="fit(vehiclesLayer)"/>
 		</v-map-control>
 	</v-map>
 </template>
@@ -31,7 +34,8 @@ import {fromLonLat} from 'ol/proj';
 import {LineString} from 'ol/geom';
 import {Vector as VectorSource} from 'ol/source';
 import Overlay from 'ol/Overlay';
-var {ol,axios}=window;
+var {ol,axios}=window
+
 ol.style.Icon=Icon;
 ol.style.Feature=Feature;
 ol.source.TileWMS=TileWMS;
@@ -40,10 +44,14 @@ ol.layer.Image=Image;
 
 export default window.ui({
 	mounted(){
-		var me=this;
-		me.ic=require('@/cdn/images/ancash.svg');
+		this.ic=require('@/cdn/images/ancash.svg');
 	},
 	data(){
+		var o = localStorage.getItem('setting'),plate='';
+		if(o){
+			o = JSON.parse(o) ;
+			plate=o.vehicle;
+		}
 		return {
 			draw:null,
 			source:null,
@@ -51,6 +59,7 @@ export default window.ui({
 			sketch:null,
 			drawing:null,
 			vehicleLayer:null,
+			vehiclesLayer:null,
 			routeLayer:null,
 			helpTooltipElement:null,
 			helpTooltip:null,
@@ -60,10 +69,11 @@ export default window.ui({
 			continueLineMsg:'Click to continue drawing the line',
 			transform:null,
 			marker:null,
+			markerV:require('@/cdn/images/car.png'),
 			groups:[],
 			showLayers:true,showConvertor:true,filters2:{},layers:[],markerIcon:null,ic:null,
 			sizeC:null,sizeR:null,/*filters: {type: 'rest'}, */
-			o: {date:new Date(),concesionTab:1,plate:'',reinfoTab:1,order: null, id: null}
+			o: {date:new Date(),concesionTab:1,mainPlate:plate,plate:plate,reinfoTab:1,order: null, id: null}
 		}
 	},
 	watch:{
@@ -79,23 +89,28 @@ export default window.ui({
 		vehicleInput(){
 			var me=this,o=me.o,today=o.date;
 			today=typeof today=='number'?new Date(today):today;
-			console.log(today);
-			axios.get('/api/geo/location',{
-					params:{
-						date:today.getFullYear()+'-'+me.pad(today.getMonth()+1,2)+'-'+me.pad(today.getDate(),2),
-						plate:o.plate
-					}}).then((e)=>{
-				var location=[];
-				e.data.forEach(e=>{
-					location.push(fromLonLat([parseFloat(e.longitude),parseFloat(e.latitude)]));
+			if(me.vehicleLayer){
+				axios.get('/api/geo/location',{
+						params:{
+							date:today.getFullYear()+'-'+me.pad(today.getMonth()+1,2)+'-'+me.pad(today.getDate(),2),
+							plate:o.plate
+						}}).then((e)=>{
+					var location=[];
+					e.data.forEach(e=>{
+						location.push(
+							e.longitude<-10000?
+							[parseFloat(e.longitude),parseFloat(e.latitude)]:
+							fromLonLat([parseFloat(e.longitude),parseFloat(e.latitude)])
+						);
+					});
+					var source=me.vehicleLayer.getSource();
+					source.clear();
+					source.addFeature(new Feature({
+						geometry: new LineString(location)
+					}));
+					me.fit(me.vehicleLayer);
 				});
-				var source=me.vehicleLayer.getSource();
-				source.clear();
-				source.addFeature(new Feature({
-					geometry: new LineString(location)
-				}));
-				me.fit(me.vehicleLayer);
-			});
+			}
 		},
 		fit(layer){
 			var map=this.$refs.map.map,view=map.getView(),ext=layer.getSource().getExtent();
@@ -164,6 +179,69 @@ export default window.ui({
 				me.da=coords;
 			});
 			
+			
+			
+			
+			let vehicleMap={};
+			var layer = new ol.layer.Vector({
+				source: new ol.source.Vector({
+					features: []
+				}),
+				style:(feature)=> {
+				
+					
+					const s2=new Style({
+						image: new ol.style.Icon({
+						anchor: [0.5, 32],
+						anchorXUnits: 'fraction',
+						anchorYUnits: 'pixels',
+						src: me.markerV
+						}),
+						text: new ol.style.Text({
+							stroke: new ol.style.Stroke({
+							color: me.o.mainPlate==feature.values_.plate?'yellow':'white',
+							width: 4
+							}),
+							text: feature.values_.plate,
+							font: 'bold 12px Arial, Verdana, Helvetica, sans-serif',
+							offsetY: 10
+						})
+					});
+				
+				
+					return s2;
+				}
+			});
+			axios.get('/api/geo/location/vehicle').then(e=>{
+				//e.data);
+				e.data.forEach(e=>{
+					let point=new ol.geom.Point(
+						e.longitude<-10000?
+						[parseFloat(e.longitude),parseFloat(e.latitude)]:
+						fromLonLat([parseFloat(e.longitude),parseFloat(e.latitude)])
+					);
+					vehicleMap[e.plate]=point;
+					layer.getSource().addFeature(new ol.Feature({
+						geometry: point,...e
+					}));
+				});
+					
+				
+			});
+			
+			
+			map.addLayer(me.vehiclesLayer=layer);
+			
+			me.app.$on('location',()=>{
+				
+			});
+			
+			/*map.on('click',(e)=>{
+				let c=e.coordinate,me=this;
+				point.setCoordinates(c);
+				c=ol.proj.toLonLat(c);
+				me.app.postLocation({plate:me.o.plate,longitude:c[0],latitude:c[1]});
+			});*/
 			map.addLayer(me.vehicleLayer=new VectorLayer({
 				source: new VectorSource(),
 				style: new Style({
@@ -179,6 +257,8 @@ export default window.ui({
 					}),
 				})
 			}));
+			if(me.o.plate)
+			me.fit(me.vehicleLayer);
 			axios.get('/api/geo/path').then((e)=>{
 				var points=[];
 				e.data.forEach(e=>{

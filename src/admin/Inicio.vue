@@ -19,11 +19,11 @@
                         <img style="padding:50px;width: 100%;object-fit: cover;height: 200px;" 
                             src="@/cdn/images/marker.gif"/>
                     </template>
-                    <ul v-if="locations.length" class="log-item">
-                        <li v-for="(log,i) in locations" style="{color:log.error?'red':(log.id?'green':'')}" :key="i">
+                    <ul v-if="locations.length" class="log-item" :key="'log-'+app.k">
+                        <li v-for="(log,i) in locations" :class="log.error?'red':(log.id>0?'green':'yellow')" :key="i" v-on:click="app.po(log)">
                             {{log.time|date}} 
-                            <template> - ERROR={{log.error}} {{log.msg}}</template>
-                            <template> - ID={{log.id }}</template>
+                            <template v-if="log.error"> - ERROR={{log.error}} {{log.msg}}</template>
+                            <template v-if="log.id"> - ID={{log.id }}</template>
                         </li>
                     </ul>
                 </template>
@@ -46,7 +46,8 @@ export default window._.ui({
         app.title='Administración';
         app.bindLinks(me.$el);
         me.o.tracking=!!app.watcher;
-        me.o.plate=JSON.parse(localStorage.getItem('setting')).vehicle;
+		let vehicle=localStorage.getItem('setting');
+		if(vehicle)me.o.plate=JSON.parse(vehicle).vehicle;
         me.changeRoute();
         /*window.axios.post('asasas',{},{error(){alert(22)},mask(){alert('mask')}}).then(function(r){
             console.log(r);
@@ -75,6 +76,15 @@ export default window._.ui({
 })
 </script>
 <style scoped>
+.yellow {
+    cursor:pointer;
+}
+.red {
+    background-color: #ffc0c8 !important;
+} 
+.green {
+    background-color: #baffba !important;
+}
     .log-item{
         max-height: 400px;
         overflow-y: auto;

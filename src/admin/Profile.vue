@@ -1,19 +1,25 @@
 <template>
-	<div class="view">
-		<template v-if="!o">No se pudo recuperar informacion</template>
-		<template v-if="o">
-			<div class="center" style="padding:20px;border-radius:10px">
+	<ion-content :scroll-events="true">
+		<v-form style="padding:10px;" class="v-form" >
+			<h2
+				style="padding-left: 34px;margin-bottom:20px;position: relative;font-size: 24px;background-color: transparent;">
+				<i class="fa fa-sliders-h" style="position: absolute; left: 2px; top: 3px;"></i>
+				Mi cuenta
+			</h2>
+			<template v-if="o">
+			<div class="center" style="padding:0px;border-radius:10px">
 				<div style="
 overflow-y: hidden;
-    width: calc(100vw - 90px);
-    height: calc(100vw - 90px);
+    width2: calc(100vw - 90px);
+    height2: calc(100vw - 90px);
+	min-height: 200px;
+	
     border-radius: 50%;
 ">
-				<img :key="img" style="width:100%;" 
-					onerror="this.src=window.logo;this.className='error'" 
+				<img :key="img" style="max-height: 200px;" 
+					@error="$event.target.src=app.imgError" 
 					:src="baseURL+'/thumb/160/foto/'+o.id+'.jpg'"/>
 				</div>
-				<div>{{o.fullName}}</div>
 				<label>Usuario</label>
 				<div>{{session.usuario}}</div>
 				<div class="right" style="margin-top:10px">
@@ -32,13 +38,13 @@ overflow-y: hidden;
 				</div>
 				<div class="v-form">
 				<label>Nombres:</label>
-				<div v-if="!editContact">{{o.names}}</div>
+				<div v-if="!editContact">{{o.names||'---'}}</div>
 				<input v-if="editContact" required="true" v-model="o.names" />
 				<label>Apellido Paterno:</label>
-				<div v-if="!editContact">{{o.apPaterno}}</div>
+				<div v-if="!editContact">{{o.apPaterno||'---'}}</div>
 				<input v-if="editContact" v-model="o.apPaterno" />
 				<label>Apellido Materno:</label>
-				<div v-if="!editContact">{{o.apMaterno}}</div>
+				<div v-if="!editContact">{{o.apMaterno||'---'}}</div>
 				<input v-if="editContact" v-model="o.apMaterno" />
 				<label>Correo:</label>
 				<div v-if="!editContact" required="true" >{{o.mail}}</div>
@@ -52,6 +58,9 @@ overflow-y: hidden;
 				<label>Celular:</label>
 				<div v-if="!editContact">{{o.phone?o.phone:'---'}}</div>
 				<input v-if="editContact" v-model="o.phone" />
+				<label>Detalles:</label>
+				<div v-if="!editContact">{{o.details?o.details:'---'}}</div>
+				<v-textarea v-if="editContact" v-model="o.details" />
 				</div>
 			</v-fieldset>
 			<v-fieldset legend="Direcci&oacute;n de env&iacute;o">
@@ -102,20 +111,22 @@ overflow-y: hidden;
 					<input type="password" v-model="o.confirm" />
 				</div>
 			</v-fieldset>
-		</template>
-	</div>
+			</template>
+		</v-form>
+	</ion-content>
 </template>
 <script>
-import {Plugins,CameraResultType,CameraSource} from '@capacitor/core';
-var axios=window.axios;
-var _=window._;
-export default window.ui({
+import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Camera, CameraResultType } from '@capacitor/camera';
+var {_,axios,ui}=window;
+export default ui({
 	data(){return{o:null,count:0,tab:0,editContact:0,editAddress:0,img:0}},
 	created(){
-		window.app.title='Cuenta';
-		window.logo=require('@/cdn/images/No_image.svg');
-		var me=this;
-		axios.get('/api/user/'+me.session.id+'/profile/').then(function(d){
+		let me=this;
+		me.app.title='Cuenta';
+		me.logo=require('@/cdn/images/No_image.svg');
+		axios.get('/api/user/me').then((d)=>{
 			console.log(d);
 			var o=d.data;
 			o.ext={};
@@ -157,25 +168,64 @@ export default window.ui({
 		test(u){
 			var me=this;
 			me.count++;
-			Plugins.Camera.getPhoto({
+			Camera.getPhoto({
 				quality: 100,
 				allowEditing: true,
-				source:CameraSource.Prompt,
+				//source:CameraSource.Prompt,
 				resultType: CameraResultType.Uri
 			}).then(function(result){
-				me.count--;
-				if(me.count==0){
-					fetch(result.webPath).then(r=>r.blob()).then(function(b) {
-						u.submitFile(b,'name.'+result.format);
-					});
-				}
+		me.count--;
+        if (me.count == 0) {
+          if (result.path) {
+            var fs = Filesystem;
+            fs.readFile({
+              path: result.path,
+            }).then(function (r) {
+              var fn = new Date().getTime() + ".jpeg";
+              fs.writeFile({
+                data: r.data,
+                path: fn,
+                directory: Directory.Data,
+              }).then(function () {
+                fs.getUri({
+                  path: fn,
+                  directory: Directory.Data,
+                }).then(function (s) {
+                  var src = Capacitor.convertFileSrc(s.uri);
+                  fetch(src)
+                    .then((r) => r.blob())
+                    .then((b) => {
+                      if (me.online) {
+                        u.submitFile(b, "name." + result.format);
+                      } else {
+                        me.changeImage({ ...result, localSrc: src, src: null });
+                      }
+                    });
+                });
+              });
+            });
+          } else
+            fetch(result.webPath)
+              .then((r) => r.blob())
+              .then((b) => {
+                console.log(result);
+                if (me.online)
+                  u.submitFile(b, "name." + result.format);
+                else {
+                  me.changeImage({ ...result, localSrc: URL.createObjectURL(b), src: null });
+                }
+              });
+        }
 			});
 		}
 	}
 });
 </script>
 <style scope>
-	img.error{
+	.v-dialog-content{
+		height:auto !important
+	}
+	img.error-{
 		padding: 30% !important;
 		width: 40% !important;
 		background-color: transparent;

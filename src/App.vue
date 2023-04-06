@@ -27,29 +27,39 @@ export default ui({
 		window.o = me.o;
 		_.app = me;
 		var session = me.session;
-		if(session){
-			window.app.profileImg = session.people ? session.people.urlPerfil : null;
+		
+		me.imgError=require('@/cdn/images/smile.png');
+		if(session.token){
+			axios.defaults.headers.common = {
+				Authorization:`Bearer ` + (session.token ? session.token : session.uid),
+			};
+			me.app.profileImg = session.people ? session.people.urlPerfil : null;
 			me.connected = session.connected;
 		}else me.$router.push('/');
-		me.imgError = require('@/cdn/images/no-image.png');
 		me.watcher = localStorage.getItem('watcher');
 		if (me.watcher) {
 			me.startWatcher();
 		}
 		var networkStatusChange = (status)=> {
-			status.connected = status.connected && me.connected;
+			status.connected = status.connected && (me.connected !== undefined?me.connected:true);
 			_.networkStatus = status;
 			me.networkStatus = status;
 		};
 		Network.addListener("networkStatusChange", networkStatusChange);
 		Network.getStatus().then(networkStatusChange);
-		_.initDB(12, [
+		_.initDB(14, [
 			["region", { keyPath: "id" }, "/admin/directory/api/region/0/0"],
 			["province", { keyPath: "code" }, "/admin/directory/api/province/0/0"],
 			["district", { keyPath: "code" }, "/admin/directory/api/district/0/0"],
-			["vehicle", { keyPath: "id" }],
+			["vehicle", { keyPath: "id" },"/api/vehicle"],
 			["setting", { keyPath: "code" }],
-		]);
+			["location", { keyPath: "time" }],
+		]).then(async ()=>{
+			me.locations=await me.getStoredList('location')||[];
+			me.locations=me.locations.sort(( a, b ) =>b.time-a.time);
+		});
+		
+
 	},
 	data() {
 		return {
@@ -78,6 +88,23 @@ export default ui({
 		}
 	},
 	watch:{
+		connected(v){
+			if(v){
+				let me=this,locations=me.locations.filter(e=>!e.id);
+				axios.post('/api/locations', locations).then((e) => {
+					e.data.forEach((e)=>{
+						me.locations.forEach((e2)=>{
+							if(e2.time==e.time){
+								e2.id=e.id;
+							}
+						});
+					});
+					me.purgeLocations();
+					me.setStoredList('location', me.locations);
+					me.k++;
+				});
+			}
+        },
         tracking(v){
             var me=this,watcher=me.app.watcher;
             if(v){
@@ -99,6 +126,22 @@ export default ui({
 		this.$emit('updated');
 	},
 	methods: {
+		purgeLocations(){
+			let me=this,b=false;
+			while(me.locations.filter((e)=>(e.id||!e.latitude)).length>10){
+				let x=-1,a=me.locations;
+				for(let i=a.length-1;i>=0;i--){
+					if(a[i].id||!a[i].latitude){x=i;break;}
+				}
+				if(x>-1)a.splice(x,1);
+				//me.locations.length=0;
+				me.locations=a;
+				b=1;
+			}
+			if(b){
+				me.setStoredList('location',me.locations);
+			}
+		},
 		addWatcher(background) {
             var me=this,app=this.app;
             BackgroundGeolocation.addWatcher(
@@ -142,7 +185,7 @@ export default ui({
 		},
 		logWatch() { },
 		logError(error) {
-			this.locations.unshift({time:new Date(),error:error});
+			this.locations.unshift({time:1*new Date(),error:error});
 		},
 		guess(timeout) {
             var me=this;
@@ -153,7 +196,33 @@ export default ui({
                 return 1;
             });
         },
-        makeGuess() {
+        po(location){
+			let me=this;
+			if(!location.id&&this.connected){
+				var config = {};
+				config.mask = () => {};
+				config.error = () => { return null };
+			
+				axios.post('/api/location', location, config).then((e) => {
+				
+					
+					me.locations.forEach((e2)=>{
+						if(e2.time==location.time){
+							e2.id=e.data.id;
+						}
+					});
+		
+			
+					
+					this.purgeLocations();
+				}).catch(function (error) {
+					location.error=''+error;
+					this.purgeLocations();
+				});
+				
+			}
+		},
+		makeGuess() {
             var me=this;
             return new Promise((resolve)=>{
 				try{
@@ -192,34 +261,44 @@ export default ui({
 			var me = this;
 			if (location.latitude) {
 				try {
-					var plate = JSON.parse(localStorage.getItem("setting")).vehicle;
-					location.plate = plate;
+					
+					if(!location.plate){
+						var plate = JSON.parse(localStorage.getItem("setting")).vehicle;
+						location.plate = plate;
+					}
+					if(!location.time){
+						location.time = 1*new Date();
+					}
 					var config = {};
 					if (!toast) {
 						config.mask = () => {};
 						config.error = () => { return null };
 					}
+					
 					if(me.connected)
 						axios.post('/api/location', location, config).then((e) => {
 							if (toast)
 								me.toast('Coordenadas enviadas!');
 							else{
-								me.logWatch(
-									'Recibido ' + e.data.id + ' ' + [
-										location.latitude,
-										location.longitude
-									].map(String).join(":")
-								)
-								me.locations.unshift({...location,id:e.data.id,time:new Date()});
+								me.locations.unshift({...location,id:e.data.id});
 							}
+							me.setStoredList('location',me.locations);
+							me.purgeLocations();
 						}).catch(function (error) {
 							me.logError(error);
-							me.locations.unshift({...location,time:new Date(),error:error});
+							me.locations.unshift({...location,time:1*new Date(),error:error});
+							me.setStoredList('location',me.locations);
+							me.purgeLocations();
 						});
-					else
-						me.locations.unshift({...location,time:new Date()});
+					else{
+						me.locations.unshift({...location,time:1*(new Date())});
+						me.setStoredList('location',me.locations);
+						me.purgeLocations();
+					}
 				} catch (e) {
 					me.logError(e);
+					me.setStoredList('location',me.locations);
+					me.purgeLocations();
 				}
 			} else {
 				me.logWatch('No se pudo enviar localizacion, datos incompletos.')

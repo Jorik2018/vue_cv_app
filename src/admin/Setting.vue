@@ -64,6 +64,7 @@ export default window._.ui({
 				clearTimeout(timer);
 				timer = setTimeout(reset, 500);
 			};
+			postAdd();
 			[
 				["/api/vehicle", "vehicle"],
 				["/admin/directory/api/district/0/0", "district"],
@@ -76,13 +77,15 @@ export default window._.ui({
 						.objectStore(e[1]);
 					data = data.data;
 					try {
-						objectStore.clear().onsuccess = () => {
+						objectStore.clear().onsuccess = async () =>  {
 							for (var i in data) {
 								try {
-									postAdd(objectStore.add(data[i]));
+								
+									await objectStore.add(data[i]);
 								} catch (exception) {
+								console.log(data[i]);
 									console.log("Error during add on " + e[1]);
-									console.log(data[i]);
+									
 									throw exception;
 								}
 							}
