@@ -6,7 +6,7 @@
 			<div class="primary center" v-bind:class="{ 'v-red': !app.networkStatus.connected }"
 				style="padding-top: 3px;padding-bottom: 7px;z-index:20;border-bottom: 1px solid #a9acb1;">
 				<a v-show="app.networkStatus.connected" 
-				style="position: absolute;right: 0px;padding: 10px;display: inline-block;font-size: 20px;" href="/search">
+				style="position: absolute;right: 0px;padding: 10px;display: inline-block;font-size: 20px;" v-if="false" href="/search">
 					<i class="fa fa-search" v-bind:class="icono"></i>
 				</a>
 				<span v-on:click="$ionic.menuController.open('menuprincipal')"

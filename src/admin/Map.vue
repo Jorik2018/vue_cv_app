@@ -32,7 +32,7 @@ import Image from 'ol/layer/Image';
 import {Circle as CircleStyle, Fill, Stroke, Style} from 'ol/style';
 import {Vector as VectorLayer} from 'ol/layer';
 import {fromLonLat} from 'ol/proj';
-import {LineString} from 'ol/geom';
+import {LineString,Point} from 'ol/geom';
 import {Vector as VectorSource} from 'ol/source';
 import Overlay from 'ol/Overlay';
 var {ol,axios}=window
@@ -87,14 +87,14 @@ export default window.ui({
 		}
 	},
 	methods: {
-		vehicleInput(){
+		vehicleInput(args){
 			var me=this,o=me.o,today=o.date;
 			today=typeof today=='number'?new Date(today):today;
 			if(me.vehicleLayer){
 				axios.get('/api/geo/location',{
 						params:{
 							date:today.getFullYear()+'-'+me.pad(today.getMonth()+1,2)+'-'+me.pad(today.getDate(),2),
-							plate:o.plate
+							plate:(args&&args.plate)||o.plate
 						}}).then((e)=>{
 					var location=[];
 					e.data.forEach(e=>{
@@ -109,6 +109,13 @@ export default window.ui({
 					source.addFeature(new Feature({
 						geometry: new LineString(location)
 					}));
+					e.data.forEach(e=>{
+						source.addFeature(new Feature({
+							geometry: new Point(e.longitude<-10000?
+							[parseFloat(e.longitude),parseFloat(e.latitude)]:
+							fromLonLat([parseFloat(e.longitude),parseFloat(e.latitude)]))
+						}));
+					});
 					me.fit(me.vehicleLayer);
 				});
 			}
@@ -176,12 +183,10 @@ export default window.ui({
 			const source= new VectorSource();
 			me.source=source;
 			source.on('changefeature',(e)=>{
+				console.log(e.feature.getGeometry());
 				var coords = e.feature.getGeometry().getCoordinates();
 				me.da=coords;
 			});
-			
-			
-			
 			
 			let vehicleMap={};
 			var layer = new ol.layer.Vector({
@@ -212,6 +217,10 @@ export default window.ui({
 				
 					return s2;
 				}
+			});
+			console.log(e);
+			e.$on('change',(e)=>{
+				me.vehicleInput(e.values_);
 			});
 			axios.get('/api/geo/location/vehicle').then(e=>{
 				//e.data);
@@ -247,19 +256,22 @@ export default window.ui({
 				source: new VectorSource(),
 				style: new Style({
 					stroke: new Stroke({
-						color: '#ff1111',
-						width: 5,
+						color: '#ff111188',
+						width: 3,
 					}),
 					image: new CircleStyle({
-						radius: 9,
+						radius: 7,
 						fill: new Fill({
 							color: '#ffcc33',
+						}),
+						stroke: new Stroke({
+							color: '#ff1111',
+							width: 1,
 						}),
 					}),
 				})
 			}));
-			if(me.o.plate)
-			me.fit(me.vehicleLayer);
+			if(me.o.plate)me.fit(me.vehicleLayer);
 			axios.get('/api/geo/path').then((e)=>{
 				var points=[];
 				e.data.forEach(e=>{
@@ -268,6 +280,16 @@ export default window.ui({
 				source.addFeature(new Feature({
 					geometry: new LineString(points)
 				}));
+				
+				
+				e.data.forEach(e=>{
+					source.addFeature(new Feature({
+						geometry: new Point([e.lat*1,e.lon*1])
+					}));
+				});
+				
+				
+				
 				map.addLayer(me.routeLayer=new VectorLayer({
 					source: source,
 					style: new Style({
@@ -275,14 +297,18 @@ export default window.ui({
 						color: 'rgba(255, 255, 255, 0.2)',
 						}),
 						stroke: new Stroke({
-						color: '#111111',
-						width: 3,
+							color: '#11111199',
+							width: 3,
 						}),
 						image: new CircleStyle({
-						radius: 9,
-						fill: new Fill({
-							color: '#ffcc33',
-						}),
+							radius: 5,
+							fill: new Fill({
+								color: '#555555',
+							}),
+							stroke: new Stroke({
+								color: '#111111',
+								width: 1,
+							}),
 						}),
 					})
 				}));
@@ -313,8 +339,6 @@ export default window.ui({
 			me.source.getFeatures().forEach((e)=>{
 				p=p.concat(e.getGeometry().getCoordinates());
 			});
-			console.log(p);
-			axios.post('/api/geo/path',{points:p}).then((e)=>{console.log(e)});
 		},
 		layerLoad(/*o*/) {
 			//var data = o.data;
