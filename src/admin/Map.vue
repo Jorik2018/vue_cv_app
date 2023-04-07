@@ -180,14 +180,6 @@ export default window.ui({
 		},
 		mapBuild(e){
 			var me=this,map=e.map;
-			const source= new VectorSource();
-			me.source=source;
-			source.on('changefeature',(e)=>{
-				console.log(e.feature.getGeometry());
-				var coords = e.feature.getGeometry().getCoordinates();
-				me.da=coords;
-			});
-			
 			let vehicleMap={};
 			var layer = new ol.layer.Vector({
 				source: new ol.source.Vector({
@@ -252,6 +244,34 @@ export default window.ui({
 				c=ol.proj.toLonLat(c);
 				me.app.postLocation({plate:me.o.plate,longitude:c[0],latitude:c[1]});
 			});*/
+			const source= new VectorSource();
+			source.on('changefeature',(e)=>{
+				console.log(e.feature.getGeometry());
+				var coords = e.feature.getGeometry().getCoordinates();
+				me.da=coords;
+			});
+			map.addLayer(me.routeLayer=new VectorLayer({
+				source: source,
+				style: new Style({
+					fill: new Fill({
+					color: 'rgba(255, 255, 255, 0.2)',
+					}),
+					stroke: new Stroke({
+						color: '#00000066',
+						width: 2,
+					}),
+					image: new CircleStyle({
+						radius: 3,
+						fill: new Fill({
+							color: '#555555',
+						}),
+						stroke: new Stroke({
+							color: '#111111',
+							width: 1,
+						}),
+					}),
+				})
+			}));
 			map.addLayer(me.vehicleLayer=new VectorLayer({
 				source: new VectorSource(),
 				style: new Style({
@@ -273,45 +293,20 @@ export default window.ui({
 			}));
 			if(me.o.plate)me.fit(me.vehicleLayer);
 			axios.get('/api/geo/path').then((e)=>{
-				var points=[];
+				let source=me.routeLayer.getSource(),points=[];
+				source.clear();
 				e.data.forEach(e=>{
 					points.push([e.lat*1,e.lon*1]);
 				});
 				source.addFeature(new Feature({
 					geometry: new LineString(points)
 				}));
-				
-				
-				e.data.forEach(e=>{
-					source.addFeature(new Feature({
-						geometry: new Point([e.lat*1,e.lon*1])
-					}));
+				e.data.forEach((e,i)=>{
+					if(i%2==0)
+						source.addFeature(new Feature({
+							geometry: new Point([e.lat*1,e.lon*1])
+						}));
 				});
-				
-				
-				
-				map.addLayer(me.routeLayer=new VectorLayer({
-					source: source,
-					style: new Style({
-						fill: new Fill({
-						color: 'rgba(255, 255, 255, 0.2)',
-						}),
-						stroke: new Stroke({
-							color: '#11111199',
-							width: 3,
-						}),
-						image: new CircleStyle({
-							radius: 5,
-							fill: new Fill({
-								color: '#555555',
-							}),
-							stroke: new Stroke({
-								color: '#111111',
-								width: 1,
-							}),
-						}),
-					})
-				}));
 			});
 		},
 		layerOnChange(evt) {
