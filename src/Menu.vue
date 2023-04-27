@@ -54,7 +54,6 @@
 				<ion-item href="/admin/hr/experience">
 					<i class="fa fa-briefcase"></i>Experiencia Laboral
 				</ion-item>
-
 				<ion-item href="/admin/hr/cv">
 					<i class="fa fa-file-text"></i>Hoja de Vida
 				</ion-item>
