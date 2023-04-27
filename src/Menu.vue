@@ -48,7 +48,7 @@
 				<ion-item href="/admin/hr/study">
 					<i class="fa fa-graduation-cap"></i>Estudios
 				</ion-item>
-				<ion-item href="/admin/hr/people">
+				<ion-item href="/admin/hr/training">
 					<i class="fa fa-certificate"></i>Capacitaciones
 				</ion-item>
 				<ion-item href="/admin/hr/experience">
