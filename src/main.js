@@ -58,8 +58,20 @@ const router = new Router({
 					component: r => require.ensure([], () => r(require('./admin/Map.vue')), 'productosgeneral'),
 				},
 				{
-					path: 'route/map', props: true,
-					component: r => require.ensure([], () => r(require('./admin/route/Map.vue')), 'productosgeneral'),
+					path: 'directory/people/create', props: true,
+					component: r => require.ensure([], () => r(require('./admin/directory/people/Create.vue')), 'productosgeneral'),
+				},
+				{
+					path: 'hr/experience/create', props: true,
+					component: r => require.ensure([], () => r(require('./admin/hr/experience/Create.vue')), 'experience'),
+				},
+				{
+					path: 'hr/study/create', props: true,
+					component: r => require.ensure([], () => r(require('./admin/hr/study/Create.vue')), 'study'),
+				},
+				{
+					path: 'hr/training/create', props: true,
+					component: r => require.ensure([], () => r(require('./admin/hr/training/Create.vue')), 'training'),
 				}
 			]
 		}

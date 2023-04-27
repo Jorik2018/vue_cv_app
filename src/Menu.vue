@@ -39,18 +39,31 @@
 				<ion-item href="/">
 					<i class="fa fa-home"></i>Inicio
 				</ion-item>
-				<ion-item href="/admin/map">
-					<i class="fa fa-map"></i>Mapa
-				</ion-item>
-				<ion-item href="/admin/route/map">
-					<i class="fa fa-draw-polygon"></i>Rutas
-				</ion-item>
 				<ion-item href="/admin/profile">
-					<i class="fa fa-user"></i>Mi Cuenta
+					<i class="fa fa-map"></i>Mi cuenta
 				</ion-item>
-				<ion-item href="/admin/setting">
-					<i class="fa fa-sliders-h"></i>Configuración
+				<ion-item href="/admin/hr/people">
+					<i class="fa fa-user"></i>Datos Personales
 				</ion-item>
+				<ion-item href="/admin/hr/study">
+					<i class="fa fa-graduation-cap"></i>Estudios
+				</ion-item>
+				<ion-item href="/admin/hr/people">
+					<i class="fa fa-certificate"></i>Capacitaciones
+				</ion-item>
+				<ion-item href="/admin/hr/experience">
+					<i class="fa fa-briefcase"></i>Experiencia Laboral
+				</ion-item>
+
+				<ion-item href="/admin/hr/cv">
+					<i class="fa fa-file-text"></i>Hoja de Vida
+				</ion-item>
+				<ion-item href="/admin/hr/douments">
+					<i class="fa fa-book"></i>Documentos
+				</ion-item>
+				yy
+
+				
 				<ion-item class="_">
 					<i class="fa fa-exclamation-triangle"></i>
 					<v-checkbox v-model="app.connected" label="Connectado"/>
