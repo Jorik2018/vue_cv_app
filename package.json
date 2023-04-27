@@ -5,7 +5,7 @@
   "scripts": {
     "update_serve": "npm install isobit-ui@latest --force && SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve",
     "serve": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve",
-	"serv": "vue-cli-service serve",
+    "serv": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "apk": "SET NODE_OPTIONS=--openssl-legacy-provider && cls && npm run build & npx cap copy && cd android && gradlew build && cd .. && start android\\app\\build\\outputs\\apk\\release ",
@@ -52,6 +52,7 @@
     "axios": "^0.19.2",
     "chart.js": "^2.9.3",
     "core-js": "^3.6.5",
+    "isobit-ui": "^0.2.109",
     "ol": "^6.6.1",
     "pinia": "^2.0.29",
     "vue": "^2.7.14",
