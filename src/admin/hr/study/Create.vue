@@ -1,12 +1,12 @@
 <template>
-  <v-form action="/admin/desarrollo-social/api/people" :header="(o.id ? 'Editar' : 'Crear') + '  Registro Cancer'"
+  <v-form action="/api/hr/study" :header="(o.id ? 'Editar' : 'Crear') + '  Estudio'"
     :class="
       o.id < 0 || (o.tmpId && !o.synchronized)
         ? 'yellow'
         : o.tmpId
           ? 'green'
           : ''
-    " store="people">
+    " store="study">
     <div class="v-form">
         <label>Titulo / Grado:</label>
         <input v-model="o.grade"/>
@@ -15,13 +15,10 @@
         <label>Fecha Expedición:</label>
         <v-calendar v-model="o.expeditionDate"/>
         <v-checkbox v-model="o.inProgress" label="Estudios en curso"/>
-        <label>Fecha Expedición:</label>
-        <v-calendar v-model="o.expeditionDate"/>
         <label>Universidad:</label>
         <input v-model="o.entity"/>
         <label>Ciudad / Pais</label>
-        <v-switch v-model="o.city"/>
-
+        <input v-model="o.city"/>
         <label>Documentación:</label>
         <v-uploader v-model="o.attachment"/>
     </div>
@@ -45,12 +42,8 @@ export default _.ui({
       count: 0,
       o: {
         id: null,
-        province_code:null,
-        district_code:null,
         synchronized: null,
-        lat: null,
-        tmpId: null,
-        lon: null,
+        tmpId: null
       },
     };
   },
@@ -76,7 +69,7 @@ export default _.ui({
   created() {
     var me = this;
     me.$on("sync", (o) => {
-      me.getStoredList("people").then((peoples) => {
+      me.getStoredList("study").then((peoples) => {
         peoples.forEach((e) => {
           if (e.tmpId == Math.abs(o.tmpId)) {
             if (e.damage_salud)
@@ -91,8 +84,8 @@ export default _.ui({
                 e.peopleId = o.id;
               });
             _.db
-              .transaction(["people"], "readwrite")
-              .objectStore("people")
+              .transaction(["study"], "readwrite")
+              .objectStore("study")
               .put(e);
           }
         });
@@ -134,10 +127,6 @@ export default _.ui({
       this.o.establecimiento = b ? b.object.name : "";
     },
     process(o) {
-      if (!this.trayLocation) {
-        this.MsgBox("Debe tratar de obtener la geolocalización.");
-        return false;
-      }
       return o;
     },
     mapBuild() {
@@ -180,8 +169,8 @@ export default _.ui({
         id = me.id, m = me.$refs.map;me.age=0;
       me.trayLocation = 0;
       if (id < 0) {
-        me.getStoredList("people").then((people) => {
-          people.forEach((e) => {
+        me.getStoredList("study").then((study) => {
+          study.forEach((e) => {
             if (e.tmpId == Math.abs(me.id)) {
               me.o = e;
               if(m)
@@ -193,7 +182,7 @@ export default _.ui({
         });
       } else if (Number(id)) {
         axios
-          .get("/admin/desarrollo-social/api/people/" + id)
+          .get("/api/hr/study/" + id)
           .then((response) => {
             var o = response.data;
             if (o.red) {
@@ -247,7 +236,7 @@ export default _.ui({
       }
       var nid = o.tmpId ? -o.tmpId : o.id;
       if (me.id != nid)
-        me.$router.replace("/admin/desarrollo-social/people/" + nid);
+        me.$router.replace("/admin/hr/study/" + nid);
     }
   },
 });

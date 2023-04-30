@@ -1,27 +1,25 @@
 <template>
-  <v-form action="/api/hr/training" :header="(o.id ? 'Editar' : 'Crear') + ' Capacitaciones'"
+  <v-form action="/api/hr/employee" :header="(o.id ? 'Editar' : 'Crear') + '  Empleados'"
     :class="
       o.id < 0 || (o.tmpId && !o.synchronized)
         ? 'yellow'
         : o.tmpId
           ? 'green'
           : ''
-    " store="training">
+    " store="people">
     <div class="v-form">
-		<label>Denominacion:</label>
-		<input v-model="o.name"/>
-		<label>Fecha Inicio:</label>
-		<v-calendar v-model="o.startDate"/>
-		<label>Fecha Termino:</label>
-		<v-calendar v-model="o.endDate"/>
-		<label>Institución:</label>
-		<input v-model="o.entity"/>
-		<label>Ciudad / Pais:</label>
-		<input v-model="o.city"/>
-		<label>Horas Lectivas:</label>
-		<v-number v-model="o.hours"/>
-		<label>Documentación:</label>
-		<v-uploader v-model="o.attachment"/>
+        <label>Entidad / Empresa:</label>
+        <input v-model="o.entity"/>
+        <label>Cargo:</label>
+        <input v-model="o.position" />
+        <label>Fecha Inicio:</label>
+        <v-calendar v-model="o.startDate"/>
+        <label>Fecha Termino:</label>
+        <v-calendar v-model="o.endDate"/>
+        <label>Experiencia Especifica?:</label>
+        <v-switch v-model="o.specific"/>
+        <label>Documentación:</label>
+        <v-switch v-model="o.attachment"/>
     </div>
     <center>
       <v-button value="Grabar" icon="fa-save" class="blue" @click.prevent="save"></v-button>
@@ -29,8 +27,6 @@
   </v-form>
 </template>
 <script>
-import { Geolocation } from "@capacitor/geolocation";
-import "ol/ol.css";
 import Feature from "ol/Feature";
 import Icon from "ol/style/Icon";
 var { _, axios, ol } = window;
@@ -43,6 +39,7 @@ export default _.ui({
       count: 0,
       red: [],
       age:null,
+      resultadoVisita: ["EJECUTADO", "RECHAZADO", "ABANDONADO"],
       trayLocation: null,
       o: {
         id: null,
@@ -73,8 +70,8 @@ export default _.ui({
   created() {
     var me = this;
     me.$on("sync", (o) => {
-      me.getStoredList("training").then((trainings) => {
-        trainings.forEach((e) => {
+      me.getStoredList("people").then((peoples) => {
+        peoples.forEach((e) => {
           if (e.tmpId == Math.abs(o.tmpId)) {
             if (e.damage_salud)
               e.damage_salud.forEach((e) => {
@@ -85,11 +82,11 @@ export default _.ui({
                       e.synchronized = o.synchronized;
                     }
                   });
-                e.trainingId = o.id;
+                e.peopleId = o.id;
               });
             _.db
-              .transaction(["training"], "readwrite")
-              .objectStore("training")
+              .transaction(["people"], "readwrite")
+              .objectStore("people")
               .put(e);
           }
         });
@@ -102,41 +99,6 @@ export default _.ui({
   },
 
   methods: {
-    inputEdad(){
-      this.o.edad=this.o.fecha_nacimiento?this.app.getAge(this.o.fecha_nacimiento):null;
-    },
-    async printCurrentPosition() {
-      this.trayLocation = 1;
-      const coordinates = await Geolocation.getCurrentPosition();
-      var c = coordinates.coords;
-      this.o.lat = c.latitude;
-      this.o.lon = c.longitude;
-    },
-    onInputFUR(o) {
-      if (o) {
-        o = new Date(o);
-        o.setFullYear(o.getFullYear() + 1);
-        o.setMonth(o.getMonth() - 3);
-        o.setDate(o.getDate() + 7);
-      }
-      this.o.gestanteFPP = _.toDate(o, "date-");
-    },
-    inputProvince(a,b){
-      var me=this,o=me.o;
-      o.province=(b ? b.object.name || "" : "");
-      me.$refs.district.load({ code: o.province_code })
-    },
-    inputDistrict(a,b){
-      var me=this,o=me.o;
-      o.district=b ? b.object.name || "" : "";
-      me.$refs.ccpp.load({ id: o.district_code })
-    },
-    inputCCPP(a, b) {
-      this.o.ccpp = b ? b.object.name || "" : "";
-    },
-    inputEstablishment(a, b) {
-      this.o.establecimiento = b ? b.object.name : "";
-    },
     process(o) {
       return o;
     },
@@ -152,13 +114,17 @@ export default _.ui({
         );
       }
     },
+    translateend(o) {
+      this.o.lat = o.lat;
+      this.o.lon = o.lon;
+    },
     async changeRoute() {
       var me = this,
         id = me.id, m = me.$refs.map;me.age=0;
       me.trayLocation = 0;
       if (id < 0) {
-        me.getStoredList("training").then((training) => {
-          training.forEach((e) => {
+        me.getStoredList("people").then((people) => {
+          people.forEach((e) => {
             if (e.tmpId == Math.abs(me.id)) {
               me.o = e;
               if(m)
@@ -170,7 +136,7 @@ export default _.ui({
         });
       } else if (Number(id)) {
         axios
-          .get("/api/hr/training/" + id)
+          .get("/admin/desarrollo-social/api/people/" + id)
           .then((response) => {
             var o = response.data;
             if (o.red) {
@@ -224,9 +190,8 @@ export default _.ui({
       }
       var nid = o.tmpId ? -o.tmpId : o.id;
       if (me.id != nid)
-        me.$router.replace("/admin/hr/training/" + nid);
-    },
-    
+        me.$router.replace("/admin/desarrollo-social/people/" + nid);
+    }
   },
 });
 </script>

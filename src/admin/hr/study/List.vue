@@ -1,8 +1,8 @@
 <template>
     <ion-content :scroll-events="true">
-        <v-form header="Estudio" action="/admin/hr/study">
+        <v-form header="Estudios" action="/admin/hr/study">
             <v-table :selectable="true" row-style-class="row.synchronized?'green':(row.tmpId>0?'yellow':'')"
-                store="study" @loaded="ll" :scrollable="true" rowKey="id" :pagination="20" @updated="app.bindLinks($el)"
+                store="study" @loaded="ll" :scrollable="true" :pagination="20" @updated="app.bindLinks($el)"
                 :filters="filters" src="/api/hr/study">
                 <template v-slot:header>
                     <v-button value="Enviar" v-if="app.connected" icon="fa-save" :disabled="!rowSelectedCount"
@@ -24,85 +24,47 @@
                         </v-filter>
                         {{ pad(row.id, 4) }}
                     </td>
-                    <td width="220" header="Province" >
+                    <td width="220" header="Grado" >
                         <v-filter>
-                            <input v-model="filters.province" />
+                            <input v-model="filters.grade" />
                         </v-filter>
-                        {{ row.province }}
+                        {{ row.grade }}
                     </td>
-                    <td width="220" header="Establecimiento" >
+                    <td width="220" header="Especialidad" >
                         <v-filter>
-                            <input v-model="filters.establecimiento" />
+                            <input v-model="filters.name" />
                         </v-filter>
-                        {{ row.establecimiento }}
+                        {{ row.name }}
                     </td>
-                    <td width="220" header="CCPP" >
+					<td width="120" header="Fecha Expedición" class="center">
                         <v-filter>
-                            <input v-model="filters.ccpp" />
+                            <input v-model="filters.expeditionDate" />
                         </v-filter>
-                        {{ row.ccpp }}
+                        {{ row.expeditionDate }}
                     </td>
-                    <td width="220" header="Dirección" >
+					<td width="220" header="Empresa" >
                         <v-filter>
-                            <input v-model="filters.direccion" />
+                            <input v-model="filters.entity" />
                         </v-filter>
-                        {{ row.direccion }}
+                        {{ row.entity }}
                     </td>
-                    <td width="120" header="DNI" class="center" >
+                    <td width="120" header="Ciudad / Pais">
                         <v-filter>
-                            <input v-model="filters.dni" class="center" />
+                            <input v-model="filters.city" />
                         </v-filter>
-                        {{ row.dni }}
+                        {{ row.city }}
                     </td>
-                    <td width="320" header="Apellidos y Nombres" >
+                    <td width="120" header="Inserted" class="center">
                         <v-filter>
-                            <input v-model="filters.apellidos_nombres" />
+                            <input v-model="filters.insertDate" />
                         </v-filter>
-                        {{ row.apellidos_nombres }}
+                        {{ row.insertDate | date}}
                     </td>
-                    <td width="120" header="Financiador" class="center">
+                    <td width="120" header="Updated" class="center">
                         <v-filter>
-                            <input v-model="filters.financiador" />
+                            <input v-model="filters.updateDate" />
                         </v-filter>
-                        {{ row.financiador }}
-                    </td>
-                    
-                    <td width="120" header="Telefono" class="center">
-                        <v-filter>
-                            <input v-model="filters.telefono" />
-                        </v-filter>
-                        {{ row.telefono }}
-                    </td>
-                    <td width="90" header="Fecha Nacimiento (Edad)" class="center">
-                        <v-filter>
-                            <input v-model="filters.fecha_nacimiento" />
-                        </v-filter>
-                        {{ row.fecha_nacimiento ||'---'}}
-                        <br/><template v-if="row.edad||row.edad==0">({{ row.edad }})</template>
-                    </td>
-                    <td width="70" header="Sexo" class="center">
-                        <v-filter>
-                            <input v-model="filters.sexo" />
-                        </v-filter>
-                        {{ row.sexo }}
-                    </td>
-                    <td width="140" header="Telefono Contacto" class="center">
-                        <v-filter>
-                            <input v-model="filters.telefono_contacto" />
-                        </v-filter>
-                        {{ row.telefono_contacto }}
-                    </td>
-                    <td width="220" header="Inserted" class="center">
-                        <v-filter>
-                            <input v-model="filters.insert_date" />
-                        </v-filter>
-                        {{ row.insert_date | date}}
-                    </td>
-                    <td width="220" header="Updated" class="center">
-                        <v-filter>
-                            <input v-model="filters.updated_date" />
-                        </v-filter>
-                        {{ row.updated_date |date}}
+                        {{ row.updateDate |date}}
                     </td>
                 </template>
             </v-table>

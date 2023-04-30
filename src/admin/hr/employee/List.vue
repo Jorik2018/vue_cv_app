@@ -1,19 +1,19 @@
 <template>
     <ion-content :scroll-events="true">
-        <v-form header="Capacitaciones" action="/admin/hr/training">
+        <v-form header="Experiencias" action="/admin/hr/experience">
             <v-table :selectable="true" row-style-class="row.synchronized?'green':(row.tmpId>0?'yellow':'')"
-                store="training" @loaded="ll" :scrollable="true" rowKey="id" :pagination="20" @updated="app.bindLinks($el)"
-                :filters="filters" src="/api/hr/training">
+                store="experience" @loaded="ll" :scrollable="true" rowKey="id" :pagination="20" @updated="app.bindLinks($el)"
+                :filters="filters" src="/api/hr/experience">
                 <template v-slot:header>
                     <v-button value="Enviar" v-if="app.connected" icon="fa-save" :disabled="!rowSelectedCount"
                         @click.prevent="sync"></v-button>
-                    <v-button value="Crear" v-if="1 || can(perms.HR_REGISTER_TRAINING)" icon="fa-plus"
+                    <v-button value="Crear" v-if="1 || can(perms.HR_REGISTER_EXPERIENCE)" icon="fa-plus"
                         class="on" @click.prevent="create"></v-button>
-                    <v-button value="Editar" v-if="1 || can(perms.HR_REGISTER_TRAINING)" icon="fa-pen"
+                    <v-button value="Editar" v-if="1 || can(perms.HR_REGISTER_EXPERIENCE)" icon="fa-pen"
                         @click.prevent="edit" :disabled="!rowSelectedCount"></v-button>
                     <v-button value="Ver" icon="fa-search" @click.prevent="view(getSelected()[0])"
                         :disabled="!rowSelectedCount"></v-button>
-                    <v-button value="Eliminar" v-if="1 || can(perms.HR_REGISTER_TRAINING)" icon="fa-trash"
+                    <v-button value="Eliminar" v-if="1 || can(perms.HR_REGISTER_EXPERIENCE)" icon="fa-trash"
                         @click.prevent="destroy" :disabled="!rowSelectedCount"></v-button>
                     <v-button title="Refrescar" icon="fa-sync" @click.prevent="refresh"></v-button>
                 </template>
@@ -92,13 +92,13 @@
                         </v-filter>
                         {{ row.telefono_contacto }}
                     </td>
-                    <td width="120" header="Inserted" class="center">
+                    <td width="220" header="Inserted" class="center">
                         <v-filter>
                             <input v-model="filters.insert_date" />
                         </v-filter>
                         {{ row.insert_date | date}}
                     </td>
-                    <td width="120" header="Updated" class="center">
+                    <td width="220" header="Updated" class="center">
                         <v-filter>
                             <input v-model="filters.updated_date" />
                         </v-filter>
@@ -152,9 +152,6 @@ export default _.ui({
             return o || u.uid == 1;
             /*return u.uid == 1 || p.REGISTER_DESARROLLO_SOCIAL_SIVICO &&
             !o || o.user == u.id;*/
-        },
-        view(o) {
-            this.open('/admin/desarrollo-social/cancer/' + (o.tmpId ? (-o.tmpId) : o.id));
         },
         toInt(o) {
             return Array.isArray(o) ? o.length : o;

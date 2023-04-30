@@ -1,12 +1,12 @@
 <template>
-  <v-form action="/admin/desarrollo-social/api/people" :header="(o.id ? 'Editar' : 'Crear') + '  Registro Cancer'"
+  <v-form action="/api/hr/experience" :header="(o.id ? 'Editar' : 'Crear') + '  Experiencia'"
     :class="
       o.id < 0 || (o.tmpId && !o.synchronized)
         ? 'yellow'
         : o.tmpId
           ? 'green'
           : ''
-    " store="people">
+    " store="experience">
     <div class="v-form">
         <label>Entidad / Empresa:</label>
         <input v-model="o.entity"/>
@@ -19,7 +19,7 @@
         <label>Experiencia Especifica?:</label>
         <v-switch v-model="o.specific"/>
         <label>Documentación:</label>
-        <v-switch v-model="o.attachment"/>
+        <v-uploader v-model="o.attachment"/>
     </div>
     <center>
       <v-button value="Grabar" icon="fa-save" class="blue" @click.prevent="save"></v-button>
@@ -27,8 +27,6 @@
   </v-form>
 </template>
 <script>
-import { Geolocation } from "@capacitor/geolocation";
-import "ol/ol.css";
 import Feature from "ol/Feature";
 import Icon from "ol/style/Icon";
 var { _, axios, ol } = window;
@@ -41,36 +39,11 @@ export default _.ui({
       count: 0,
       red: [],
       age:null,
-      financiador:[
-        "NINGUNA","SIS", "ESSALUD", "PRIVADA", "PNP" 
-      ],
-      risk: [
-        "INVIDENTE",
-        "DIFICULTAD PIERNAS",
-        "DISCAPACIDAD CARA",
-        "DISCAPACIDAD CARA Y LABIOS",
-        "DISCAPACIDAD MENTAL",
-        "EXTREMIDADES",
-        "MINUSVALIDA",
-        "PARALISIS",
-        "SORDO MUDO",
-        "SINDROME DOWN",
-        "SORDERA",
-        "SORDO MUDO",
-        "TARTAMUDO",
-        "TRANSTORNO DE CADERA",
-        "Otro",
-      ],
-      resultadoVisita: ["EJECUTADO", "RECHAZADO", "ABANDONADO"],
       trayLocation: null,
       o: {
         id: null,
-        province_code:null,
-        district_code:null,
         synchronized: null,
-        lat: null,
-        tmpId: null,
-        lon: null,
+        tmpId: null
       },
     };
   },
@@ -96,8 +69,8 @@ export default _.ui({
   created() {
     var me = this;
     me.$on("sync", (o) => {
-      me.getStoredList("people").then((peoples) => {
-        peoples.forEach((e) => {
+      me.getStoredList("experience").then((experiences) => {
+        experiences.forEach((e) => {
           if (e.tmpId == Math.abs(o.tmpId)) {
             if (e.damage_salud)
               e.damage_salud.forEach((e) => {
@@ -108,11 +81,11 @@ export default _.ui({
                       e.synchronized = o.synchronized;
                     }
                   });
-                e.peopleId = o.id;
+                e.experienceId = o.id;
               });
             _.db
-              .transaction(["people"], "readwrite")
-              .objectStore("people")
+              .transaction(["experience"], "readwrite")
+              .objectStore("experience")
               .put(e);
           }
         });
@@ -125,46 +98,7 @@ export default _.ui({
   },
 
   methods: {
-    inputEdad(){
-      this.o.edad=this.o.fecha_nacimiento?this.app.getAge(this.o.fecha_nacimiento):null;
-    },
-    async printCurrentPosition() {
-      this.trayLocation = 1;
-      const coordinates = await Geolocation.getCurrentPosition();
-      var c = coordinates.coords;
-      this.o.lat = c.latitude;
-      this.o.lon = c.longitude;
-    },
-    onInputFUR(o) {
-      if (o) {
-        o = new Date(o);
-        o.setFullYear(o.getFullYear() + 1);
-        o.setMonth(o.getMonth() - 3);
-        o.setDate(o.getDate() + 7);
-      }
-      this.o.gestanteFPP = _.toDate(o, "date-");
-    },
-    inputProvince(a,b){
-      var me=this,o=me.o;
-      o.province=(b ? b.object.name || "" : "");
-      me.$refs.district.load({ code: o.province_code })
-    },
-    inputDistrict(a,b){
-      var me=this,o=me.o;
-      o.district=b ? b.object.name || "" : "";
-      me.$refs.ccpp.load({ id: o.district_code })
-    },
-    inputCCPP(a, b) {
-      this.o.ccpp = b ? b.object.name || "" : "";
-    },
-    inputEstablishment(a, b) {
-      this.o.establecimiento = b ? b.object.name : "";
-    },
     process(o) {
-      if (!this.trayLocation) {
-        this.MsgBox("Debe tratar de obtener la geolocalización.");
-        return false;
-      }
       return o;
     },
     mapBuild() {
@@ -183,46 +117,28 @@ export default _.ui({
       this.o.lat = o.lat;
       this.o.lon = o.lon;
     },
-    async addMarker() {
-      //var o = this.o;
-      var me = this,
-        m = me.$refs.map;
-      if (!m.collection.getLength()) {
-        me.trayLocation = 1;
-        const coordinates = await Geolocation.getCurrentPosition();
-        var c = coordinates.coords;
-        me.o.lat = c.latitude;
-        me.o.lon = c.longitude;
-        if(m)
-        m.addFeature({ draggable: true, lat: me.o.lat, lon: me.o.lon }, { zoom: 14 });
-      } else
-        m.map.getView().animate({
-          center: m.collection.item(0).getGeometry().getCoordinates(),
-          zoom: 17,
-          duration: 500,
-        });
-    },
     async changeRoute() {
       var me = this,
         id = me.id, m = me.$refs.map;me.age=0;
       me.trayLocation = 0;
       if (id < 0) {
-        me.getStoredList("people").then((people) => {
-          people.forEach((e) => {
+        me.getStoredList("experience").then((experience) => {
+          experience.forEach((e) => {
             if (e.tmpId == Math.abs(me.id)) {
               me.o = e;
               if(m)
               m.addFeature({ draggable: true, lat: me.o.lat, lon: me.o.lon }, { zoom: 14 });
-              me.$refs.province.load({ code: me.o.region || "02" });
+              //me.$refs.province.load({ code: me.o.region || "02" });
               me.trayLocation = Number(e.lat) && e.lon;
             }
           });
         });
       } else if (Number(id)) {
         axios
-          .get("/admin/desarrollo-social/api/people/" + id)
+          .get("/api/hr/experience/" + id)
           .then((response) => {
             var o = response.data;
+			o.specific=o.specific=='1';
             if (o.red) {
               o.red = me.pad(o.red, 2);
             }
@@ -243,7 +159,6 @@ export default _.ui({
               m.addFeature({ draggable: true, lat: o.lat, lon: o.lon }, { zoom: 14 });
               me.trayLocation = 1;
             }
-            me.$refs.province.load({ code: o && o.region || '02' });
           });
       } else {
         try {
@@ -260,7 +175,7 @@ export default _.ui({
         } catch (e) {
           console.log(e);
         }
-        me.$refs.province.load({ code: me.o && me.o.region || '02' });
+        //me.$refs.province.load({ code: me.o && me.o.region || '02' });
       }
     },
     close(r) {
@@ -274,25 +189,8 @@ export default _.ui({
       }
       var nid = o.tmpId ? -o.tmpId : o.id;
       if (me.id != nid)
-        me.$router.replace("/admin/desarrollo-social/people/" + nid);
-    },
-    async getCurrentPosition() {
-      var me = this;
-      //const {Geolocation} = Plugins;
-      const c = await Geolocation.getCurrentPosition();
-      me.o.lat = c.coords.latitude;
-      me.o.lon = c.coords.longitude;
-    },
-    getCoordinates() {
-      var me = this;
-      if (me.getCurrentPosition) {
-        me.getCurrentPosition();
-      } else
-        _.getLocation().then(function (c) {
-          me.o.lat = c.coords.latitude;
-          me.o.lon = c.coords.longitude;
-        });
-    },
+        me.$router.replace("/admin/hr/experience/" + nid);
+    }
   },
 });
 </script>

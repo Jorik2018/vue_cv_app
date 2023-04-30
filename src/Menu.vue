@@ -60,9 +60,6 @@
 				<ion-item href="/admin/hr/douments">
 					<i class="fa fa-book"></i>Documentos
 				</ion-item>
-				yy
-
-				
 				<ion-item class="_">
 					<i class="fa fa-exclamation-triangle"></i>
 					<v-checkbox v-model="app.connected" label="Connectado"/>

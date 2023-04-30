@@ -47,12 +47,16 @@ export default ui({
 		};
 		Network.addListener("networkStatusChange", networkStatusChange);
 		Network.getStatus().then(networkStatusChange);
-		_.initDB(14, [
+		_.initDB(15, [
 			["region", { keyPath: "id" }, "/admin/directory/api/region/0/0"],
 			["province", { keyPath: "code" }, "/admin/directory/api/province/0/0"],
 			["district", { keyPath: "code" }, "/admin/directory/api/district/0/0"],
 			["vehicle", { keyPath: "id" },"/api/vehicle"],
 			["setting", { keyPath: "code" }],
+			["experience", { keyPath: "id" }],
+			["training", { keyPath: "id" }],
+			["study", { keyPath: "id" }],
+			["employee", { keyPath: "id" }],
 			["location", { keyPath: "time" }],
 		]).then(async ()=>{
 			me.locations=await me.getStoredList('location')||[];
