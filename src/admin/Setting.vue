@@ -30,14 +30,6 @@
 					<option value="">Seleccionar Opción</option>
 					<v-options store="district" display-field="name" />
 				</v-select>
-				<label>Vehiculo:</label>
-				<v-select v-model="o.vehicle">
-					<option value="">Seleccionar Opción</option>
-					<v-options store="vehicle" display-field="plate" value-field="plate" />
-				</v-select>
-				<v-button icon="fa fa-save" value="Guardar Seleccion" @click="save"
-					style="margin-top:10px;width:-webkit-fill-available;" />
-
 			</v-fieldset>
 		</v-form>
 	</ion-content>
