@@ -2,7 +2,6 @@
     <ion-content :scroll-events="true">
 		<v-form>
             <div class="v-form">
-                <label>Vehiculo</label>
                 <div>
                    
                     <a class="bold v-button block center" style="margin:10px 0px" href="/admin/setting">

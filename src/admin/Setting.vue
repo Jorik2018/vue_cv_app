@@ -2,7 +2,8 @@
 	<ion-content :scroll-events="true">
 		<v-form style="padding:10px;" class="v-form" store="setting">
 			<h2
-				style="padding-left: 34px;margin-bottom:20px;position: relative;font-size: 24px;background-color: transparent;">
+				style="padding-left: 34px;margin-bottom:20px;position: relative;
+				font-size: 24px;background-color: transparent;">
 				<i class="fa fa-sliders-h" style="position: absolute; left: 2px; top: 3px;"></i>
 				Configuración
 			</h2>
