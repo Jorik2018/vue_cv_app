@@ -3,30 +3,12 @@
 		<v-form>
             <div class="v-form">
                 <label>Vehiculo</label>
-                <div v-if="!o.plate">Debe tener seleccionado un vehiculo.
+                <div>
                    
                     <a class="bold v-button block center" style="margin:10px 0px" href="/admin/setting">
                     Ir a Configuración</a>
                 </div>
-                <template v-else>
-                    <div>{{o.plate}}</div>
-                    <label>Activar Tracking por GPS</label>
-                    <v-switch class="v-switch" v-model="app.tracking" />
-                    <v-button @click="app.guess(1000)" style="margin-top:10px" 
-                        value="Enviar Geolocalización"/>
-                    <template v-if="app.watcher">
-                        <div class="center" style="padding:10px">{{app.watcher}}</div>
-                        <img style="padding:50px;width: 100%;object-fit: cover;height: 200px;" 
-                            src="@/cdn/images/marker.gif"/>
-                    </template>
-                    <ul v-if="locations.length" class="log-item" :key="'log-'+app.k">
-                        <li v-for="(log,i) in locations" :class="log.error?'red':(log.id>0?'green':'yellow')" :key="i" v-on:click="app.po(log)">
-                            {{log.time|date}} 
-                            <template v-if="log.error"> - ERROR={{log.error}} {{log.msg}}</template>
-                            <template v-if="log.id"> - ID={{log.id }}</template>
-                        </li>
-                    </ul>
-                </template>
+                
             </div>
 		</v-form>
     </ion-content>		
