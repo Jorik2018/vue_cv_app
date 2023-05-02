@@ -508,10 +508,6 @@ li>.v-primary-dark {
 	border: 0px solid white;
 }
 
-body {
-	background-color: #0f62ac;
-}
-
 #app {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
