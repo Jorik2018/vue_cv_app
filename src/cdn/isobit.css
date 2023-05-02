@@ -2877,32 +2877,7 @@ button.v-filter{
 .tre > ul > li {
     background-color: #0d4b82;
 }
-/*
-.v-datatable thead th, .v-datatable tbody td, .v-datatable tfoot td, .v-datatable tfoot th {
-padding: 4px 5px;
-border-color: rgb(204 208 212 / 0);
-}
-.group {
-background-color: #0f62ac;
-}
-.group:hover {
-background-color: #0f62ac;
-}
-.v-widget-header {
-border: 0px solid #0f62ac;
-background: #c4c4c4 linear-gradient(top,rgba(255,255,255,0.8),rgba(255,255,255,0));
-background: #0f62ac;
-background: #c4c4c4 -moz-linear-gradient(top,rgba(255,255,255,0.8),rgba(255,255,255,0));
-color: #fff;
-font-weight: bold;
-text-shadow: unset; 
-}
-.ui-panel .v-panel-title {
-font-weight: bolder;
-}
-.v-widget-header{
-background-color: black;
-}*/
+
 .v-c-6{
     width: calc(50% - 5px) !important;
     margin: 0px 3px;

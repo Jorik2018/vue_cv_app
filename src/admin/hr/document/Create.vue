@@ -144,7 +144,6 @@ export default _.ui({
           .get("/api/hr/document/" + id)
           .then((response) => {
             var o = response.data;
-			o.specific=o.specific=='1';
             if (o.red) {
               o.red = me.pad(o.red, 2);
             }
