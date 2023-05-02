@@ -57,7 +57,7 @@
 				<ion-item href="/admin/hr/cv">
 					<i class="fa fa-file-text"></i>Hoja de Vida
 				</ion-item>
-				<ion-item href="/admin/hr/douments">
+				<ion-item href="/admin/hr/document">
 					<i class="fa fa-book"></i>Documentos
 				</ion-item>
 				<ion-item class="_">
@@ -178,7 +178,7 @@ export default window.ui({
 	}
 	ion-menu.item {
 		top: 0px;
-		-border-bottom:1px solid #bfbfbf !important;
+		border-bottom:1px solid #bfbfbf !important;
 	}
 	.item-inner{
 		border-bottom-width:0px !important;

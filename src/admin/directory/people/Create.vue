@@ -1,5 +1,5 @@
 <template>
-  <v-form action="/admin/desarrollo-social/api/people" :header="(o.id ? 'Editar' : 'Crear') + '  Registro Cancer'"
+  <v-form action="/admin/desarrollo-social/api/people" :header="(o.id ? 'Editar' : 'Crear') + '  Registro Datos'"
     :class="
       o.id < 0 || (o.tmpId && !o.synchronized)
         ? 'yellow'

@@ -128,7 +128,24 @@ const router = new Router({
 				{
 					path: 'hr/training/:id/edit', props: true,
 					component: r => require.ensure([], () => r(require('./admin/hr/training/Create.vue')), 'training'),
+				},
+				{
+					path: 'hr/document', props: true,
+					component: r => require.ensure([], () => r(require('./admin/hr/document/List.vue')), 'document'),
+				},
+				{
+					path: 'hr/document/create', 
+					component: r => require.ensure([], () => r(require('./admin/hr/document/Create.vue')), 'document'),
+				},
+				{
+					path: 'hr/document/:id', props: true,
+					component: r => require.ensure([], () => r(require('./admin/hr/document/Create.vue')), 'document'),
+				},
+				{
+					path: 'hr/document/:id/edit', props: true,
+					component: r => require.ensure([], () => r(require('./admin/hr/document/Create.vue')), 'document'),
 				}
+
 			]
 		}
 	]
