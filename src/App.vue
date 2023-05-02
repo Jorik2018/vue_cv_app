@@ -47,7 +47,7 @@ export default ui({
 		};
 		Network.addListener("networkStatusChange", networkStatusChange);
 		Network.getStatus().then(networkStatusChange);
-		_.initDB(15, [
+		_.initDB(16, [
 			["region", { keyPath: "id" }, "/admin/directory/api/region/0/0"],
 			["province", { keyPath: "code" }, "/admin/directory/api/province/0/0"],
 			["district", { keyPath: "code" }, "/admin/directory/api/district/0/0"],
@@ -55,6 +55,7 @@ export default ui({
 			["setting", { keyPath: "code" }],
 			["experience", { keyPath: "id" }],
 			["training", { keyPath: "id" }],
+			["document", { keyPath: "id" }],
 			["study", { keyPath: "id" }],
 			["employee", { keyPath: "id" }],
 			["location", { keyPath: "time" }],
