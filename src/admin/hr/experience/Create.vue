@@ -19,7 +19,15 @@
         <label>Experiencia Especifica?:</label>
         <v-switch v-model="o.specific"/>
         <label>Documentación:</label>
-        <v-uploader v-model="o.attachment"/>
+        <template v-if="o.attachment">
+      <a v-if="o.attachment.tempFile" :href="'/uploads/'+o.attachment.tempFile" target="_new" >
+      {{ o.attachment.tempFile }}
+    </a>
+    <a v-else :href="'/uploads/'+o.attachment" target="_new">
+      {{ o.attachment }}
+    </a>
+    </template>
+		<v-uploader icon="fa-upload" @input="o.attachment=$event"/>
     </div>
     <center>
       <v-button value="Grabar" icon="fa-save" class="blue" @click.prevent="save"></v-button>

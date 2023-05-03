@@ -20,8 +20,16 @@
 		<input v-model="o.city"/>
 		<label>Horas Lectivas:</label>
 		<v-number v-model="o.hours"/>
-		<label>Documentación:</label>
-		<v-uploader v-model="o.attachment"/>
+		<label>Documentación: </label>
+    <template v-if="o.attachment">
+      <a v-if="o.attachment.tempFile" :href="'/uploads/'+o.attachment.tempFile" target="_new" >
+      {{ o.attachment.tempFile }}
+    </a>
+    <a v-else :href="'/uploads/'+o.attachment" target="_new">
+      {{ o.attachment }}
+    </a>
+    </template>
+		<v-uploader icon="fa-upload" @input="o.attachment=$event"/>
     </div>
     <center>
       <v-button value="Grabar" icon="fa-save" class="blue" @click.prevent="save"></v-button>
@@ -29,13 +37,7 @@
   </v-form>
 </template>
 <script>
-import { Geolocation } from "@capacitor/geolocation";
-import "ol/ol.css";
-import Feature from "ol/Feature";
-import Icon from "ol/style/Icon";
-var { _, axios, ol } = window;
-ol.style.Icon = Icon;
-ol.style.Feature = Feature;
+var { _, axios } = window;
 export default _.ui({
   props: ["id"],
   data() {
@@ -102,16 +104,6 @@ export default _.ui({
   },
 
   methods: {
-    inputEdad(){
-      this.o.edad=this.o.fecha_nacimiento?this.app.getAge(this.o.fecha_nacimiento):null;
-    },
-    async printCurrentPosition() {
-      this.trayLocation = 1;
-      const coordinates = await Geolocation.getCurrentPosition();
-      var c = coordinates.coords;
-      this.o.lat = c.latitude;
-      this.o.lon = c.longitude;
-    },
     onInputFUR(o) {
       if (o) {
         o = new Date(o);
@@ -120,16 +112,6 @@ export default _.ui({
         o.setDate(o.getDate() + 7);
       }
       this.o.gestanteFPP = _.toDate(o, "date-");
-    },
-    inputProvince(a,b){
-      var me=this,o=me.o;
-      o.province=(b ? b.object.name || "" : "");
-      me.$refs.district.load({ code: o.province_code })
-    },
-    inputDistrict(a,b){
-      var me=this,o=me.o;
-      o.district=b ? b.object.name || "" : "";
-      me.$refs.ccpp.load({ id: o.district_code })
     },
     inputCCPP(a, b) {
       this.o.ccpp = b ? b.object.name || "" : "";
@@ -183,34 +165,8 @@ export default _.ui({
               o.province_code = me.pad(o.province_code, 4);
               o.region = o.province_code.substring(0, 2);
             }
-            if (o.district_code) o.district_code= me.pad(o.district_code, 6);
-            if (o.ccpp_code) o.ccpp_code= me.pad(o.ccpp_code, 10);
-            me.trayLocation = 0;
             me.o = o;
-            me.age=o.edad;
-            if(Number(o.lat)&&Number(o.lon)){
-              if(m)
-              m.addFeature({ draggable: true, lat: o.lat, lon: o.lon }, { zoom: 14 });
-              me.trayLocation = 1;
-            }
-            me.$refs.province.load({ code: o && o.region || '02' });
           });
-      } else {
-        try {
-          var s = localStorage.getItem("setting");
-          if (s) {
-            s = JSON.parse(s);
-            var o = this.o;
-            if (s.region) o.region = s.region.code;
-            if (s.province) o.province_code = s.province.code;
-            if (s.district) o.district_code = s.district.code;
-            if (s.town) o.ccpp_code = s.town.id;
-            /*o.town = s.town;*/
-          }
-        } catch (e) {
-          console.log(e);
-        }
-        me.$refs.province.load({ code: me.o && me.o.region || '02' });
       }
     },
     close(r) {

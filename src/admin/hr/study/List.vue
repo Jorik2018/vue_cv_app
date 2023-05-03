@@ -54,6 +54,15 @@
                         </v-filter>
                         {{ row.city }}
                     </td>
+                    <td width="140" header="Documento" class="center">
+                        <v-filter>
+                            <input v-model="filters.attachment" />
+                        </v-filter>
+                        <a v-if="o.attachment" :href="'/uploads/'+o.attachment" target="_new">
+      
+      {{ o.attachment }}
+    </a>
+                    </td>
                     <td width="120" header="Inserted" class="center">
                         <v-filter>
                             <input v-model="filters.insertDate" />

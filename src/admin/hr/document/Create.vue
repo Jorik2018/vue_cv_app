@@ -21,9 +21,9 @@
         <label>Términos de Referencia (TDR):</label>
         <v-uploader v-model="o.tdr"/>
         <label>Registro Único de Contribuyentes (RUC):</label>
-        <v-uploader v-model="o.suspención"/>
+        <v-uploader v-model="o.suspencion"/>
         <label>Suspencion de Cuarta Categoria:</label>
-        <v-uploader v-model="o.suspención"/>
+        <v-uploader v-model="o.suspencion"/>
         <label>Registro Nacional de Proveedores (RNP):</label>
         <v-uploader v-model="o.rnp"/>
     </div>
