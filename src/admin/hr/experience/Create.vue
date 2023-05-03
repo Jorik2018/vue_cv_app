@@ -48,10 +48,10 @@ export default _.ui({
       red: [],
       age:null,
       trayLocation: null,
-      attachment:null,
       o: {
         id: null,
         synchronized: null,
+        attachment:null,
         tmpId: null
       },
     };
