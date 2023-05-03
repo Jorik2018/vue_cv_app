@@ -55,11 +55,11 @@
                         </v-filter>
                         {{ row.specific }}
                     </td>
-                    <td width="140" header="Documento" class="center">
+                    <td width="200" header="Documento" class="center">
                         <v-filter>
                             <input v-model="filters.attachment" />
                         </v-filter>
-                        <a v-if="row.attachment" :href="'/uploads/'+row.attachment" target="_new">
+                        <a class="_" v-if="row.attachment" :href="'/uploads/'+row.attachment" target="_new">
       
       {{ row.attachment }}
     </a>

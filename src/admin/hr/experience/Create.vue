@@ -20,10 +20,10 @@
         <v-switch v-model="o.specific"/>
         <label>Documentación:</label>
         <template v-if="o.attachment">
-      <a v-if="o.attachment.tempFile" :href="'/uploads/'+o.attachment.tempFile" target="_new" >
+      <a class="_" v-if="o.attachment.tempFile" :href="'/uploads/'+o.attachment.tempFile" target="_new" >
       {{ o.attachment.tempFile }}
     </a>
-    <a v-else :href="'/uploads/'+o.attachment" target="_new">
+    <a class="_" v-else :href="'/uploads/'+o.attachment" target="_new">
       {{ o.attachment }}
     </a>
     </template>
@@ -48,6 +48,7 @@ export default _.ui({
       red: [],
       age:null,
       trayLocation: null,
+      attachment:null,
       o: {
         id: null,
         synchronized: null,
