@@ -64,9 +64,9 @@
                         <v-filter>
                             <input v-model="filters.attachment" />
                         </v-filter>
-                        <a v-if="o.attachment" :href="'/uploads/'+o.attachment" target="_new">
+                        <a v-if="row.attachment" :href="'/uploads/'+row.attachment" target="_new">
       
-      {{ o.attachment }}
+      {{ row.attachment }}
     </a>
                     </td>
                     <td width="120" header="Inserted" class="center">
