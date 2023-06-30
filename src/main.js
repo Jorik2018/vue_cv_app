@@ -63,11 +63,11 @@ const router = new Router({
 				},
 				{
 					path: 'hr/people', props: true,
-					component: r => require.ensure([], () => r(require('./admin/directory/people/Create.vue')), 'employee'),
+					component: r => require.ensure([], () => r(require('./admin/directory/people/List.vue')), 'employee'),
 				},
 				{
-					path: 'hr/employee/create', props: true,
-					component: r => require.ensure([], () => r(require('./admin/hr/employee/Create.vue')), 'employee'),
+					path: 'hr/employee', props: true,
+					component: r => require.ensure([], () => r(require('./admin/hr/employee/List.vue')), 'employee'),
 				},
 				{
 					path: 'hr/employee/create', props: true,
@@ -75,7 +75,7 @@ const router = new Router({
 				},
 				{
 					path: 'hr/employee/:id', props: true,
-					component: r => require.ensure([], () => r(require('./admin/hr/employee/Create.vue')), 'employee'),
+					component: r => require.ensure([], () => r(require('./admin/hr/employee/View.vue')), 'employee'),
 				},
 				{
 					path: 'hr/employee/:id/edit', props: true,
@@ -87,6 +87,10 @@ const router = new Router({
 				},
 				{
 					path: 'hr/experience/create', props: true,
+					component: r => require.ensure([], () => r(require('./admin/hr/experience/Create.vue')), 'experience'),
+				},
+				{
+					path: 'hr/employee/:employee/experience/create', props: true,
 					component: r => require.ensure([], () => r(require('./admin/hr/experience/Create.vue')), 'experience'),
 				},
 				{
@@ -106,6 +110,10 @@ const router = new Router({
 					component: r => require.ensure([], () => r(require('./admin/hr/study/Create.vue')), 'study'),
 				},
 				{
+					path: 'hr/employee/:employee/study/create', props: true,
+					component: r => require.ensure([], () => r(require('./admin/hr/study/Create.vue')), 'study'),
+				},
+				{
 					path: 'hr/study/:id', props: true,
 					component: r => require.ensure([], () => r(require('./admin/hr/study/Create.vue')), 'study'),
 				},
@@ -122,6 +130,10 @@ const router = new Router({
 					component: r => require.ensure([], () => r(require('./admin/hr/training/Create.vue')), 'training'),
 				},
 				{
+					path: 'hr/employee/:employee/training/create', props: true,
+					component: r => require.ensure([], () => r(require('./admin/hr/training/Create.vue')), 'training'),
+				},
+				{
 					path: 'hr/training/:id', props: true,
 					component: r => require.ensure([], () => r(require('./admin/hr/training/Create.vue')), 'training'),
 				},
@@ -130,11 +142,15 @@ const router = new Router({
 					component: r => require.ensure([], () => r(require('./admin/hr/training/Create.vue')), 'training'),
 				},
 				{
-					path: 'hr/document', props: true,
+					path: 'hr/document',
 					component: r => require.ensure([], () => r(require('./admin/hr/document/List.vue')), 'document'),
 				},
 				{
 					path: 'hr/document/create', 
+					component: r => require.ensure([], () => r(require('./admin/hr/document/Create.vue')), 'document'),
+				},
+				{
+					path: 'hr/employee/:employee/document/create', 
 					component: r => require.ensure([], () => r(require('./admin/hr/document/Create.vue')), 'document'),
 				},
 				{

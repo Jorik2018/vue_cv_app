@@ -8,6 +8,8 @@
           : ''
     " store="training">
     <div class="v-form">
+		<label>Empleado:</label>
+		<div><a :href="'/admin/hr/employee/'+o.employeeId"><template v-if="o.people">{{o.people.surnames}} {{o.people.names}}</template></a></div>
 		<label>Denominacion:</label>
 		<input v-model="o.name"/>
 		<label>Fecha Inicio:</label>
@@ -21,14 +23,14 @@
 		<label>Horas Lectivas:</label>
 		<v-number v-model="o.hours"/>
 		<label>Documentación: </label>
-    <template v-if="o.attachment">
-      <a class="_" v-if="o.attachment.tempFile" :href="'/uploads/'+o.attachment.tempFile" target="_new" >
-      {{ o.attachment.tempFile }}
-    </a>
-    <a class="_" v-else :href="'/uploads/'+o.attachment" target="_new">
-      {{ o.attachment }}
-    </a>
-    </template>
+		<template v-if="o.attachment">
+			<a class="_" v-if="o.attachment.tempFile" :href="'/uploads/'+o.attachment.tempFile" target="_new" >
+				{{ o.attachment.tempFile }}
+			</a>
+			<a class="_" v-else :href="'/uploads/'+o.attachment" target="_new">
+				{{ o.attachment }}
+			</a>
+		</template>
 		<v-uploader icon="fa-upload" @input="o.attachment=$event"/>
     </div>
     <center>
@@ -39,21 +41,22 @@
 <script>
 var { _, axios } = window;
 export default _.ui({
-  props: ["id"],
-  data() {
-    return {
-      count: 0,
-      red: [],
-      age:null,
-      trayLocation: null,
-      o: {
-        id: null,
-        attachment:null,
-        synchronized: null,
-        tmpId: null
-      },
-    };
-  },
+	props: ["id","employee"],
+	data() {
+		return {
+			count: 0,
+			red: [],
+			age:null,
+			trayLocation: null,
+			o: {
+				id: null,
+				attachment:null,
+				synchronized: null,
+				tmpId: null,
+				employeeId:null
+			},
+		};
+	},
   computed: {
     filteredEvent() {
       return this.o.category != null
@@ -135,41 +138,33 @@ export default _.ui({
         );
       }
     },
-    async changeRoute() {
-      var me = this,
-        id = me.id, m = me.$refs.map;me.age=0;
-      me.trayLocation = 0;
-      if (id < 0) {
-        me.getStoredList("training").then((training) => {
-          training.forEach((e) => {
-            if (e.tmpId == Math.abs(me.id)) {
-              me.o = e;
-              if(m)
-              m.addFeature({ draggable: true, lat: me.o.lat, lon: me.o.lon }, { zoom: 14 });
-              me.$refs.province.load({ code: me.o.region || "02" });
-              me.trayLocation = Number(e.lat) && e.lon;
-            }
-          });
-        });
-      } else if (Number(id)) {
-        axios
-          .get("/api/hr/training/" + id)
-          .then((response) => {
-            var o = response.data;
-            if (o.red) {
-              o.red = me.pad(o.red, 2);
-            }
-            if (o.microred) {
-              o.microred = me.pad(o.microred, 4);
-            }
-            if (o.province_code) {
-              o.province_code = me.pad(o.province_code, 4);
-              o.region = o.province_code.substring(0, 2);
-            }
-            me.o = o;
-          });
-      }
-    },
+	async changeRoute() {
+		var me = this,
+		id = me.id;
+		me.trayLocation = 0;
+		if (id < 0) {
+			me.getStoredList("training").then((training) => {
+				training.forEach((e) => {
+					if (e.tmpId == Math.abs(me.id)) {
+						me.o = e;
+						me.$refs.province.load({ code: me.o.region || "02" });
+						me.trayLocation = Number(e.lat) && e.lon;
+					}
+				});
+			});
+		} else if (Number(id)) {
+			axios.get("/api/hr/training/" + id).then((response) => {
+				var o = response.data;
+				if (o.province_code) {
+				o.province_code = me.pad(o.province_code, 4);
+				o.region = o.province_code.substring(0, 2);
+				}
+				me.o = o;
+			});
+		}else{
+			me.o.employeeId=me.employee;
+		}
+	},
     close(r) {
       var me = this, o = me.o;
       if (r.success === true) {

@@ -1,5 +1,5 @@
 <template>
-  <v-form action="/api/hr/employee" :header="(o.id ? 'Editar' : 'Crear') + '  Empleados'"
+  <v-form action="/api/hr/employee" :header="(o.id ? 'Editar' : 'Crear') + '  Empleado'"
     :class="
       o.id < 0 || (o.tmpId && !o.synchronized)
         ? 'yellow'
@@ -12,17 +12,16 @@
         <input v-model="o.entity"/>
         <label>Cargo:</label>
         <input v-model="o.position" />
-        <label>Fecha Inicio:</label>
-        <v-calendar v-model="o.startDate"/>
-        <label>Fecha Termino:</label>
-        <v-calendar v-model="o.endDate"/>
-        <label>Experiencia Especifica?:</label>
-        <v-switch v-model="o.specific"/>
-        <label>Documentación:</label>
-        <v-switch v-model="o.attachment"/>
+		<label>Codigo:</label>
+        <input v-model="o.code" />
+		<label>Apellidos:</label>
+        <input v-model="o.surnames" />
+		<label>Nombres:</label>
+        <input v-model="o.names" />
     </div>
     <center>
-      <v-button value="Grabar" icon="fa-save" class="blue" @click.prevent="save"></v-button>
+		<v-button value="Grabar" icon="fa-save" class="blue" @click.prevent="save"></v-button>
+		<v-button value="Ver" icon="fa-eye" class="blue" @click.prevent="view"></v-button>
     </center>
   </v-form>
 </template>
@@ -39,7 +38,6 @@ export default _.ui({
       count: 0,
       red: [],
       age:null,
-      resultadoVisita: ["EJECUTADO", "RECHAZADO", "ABANDONADO"],
       trayLocation: null,
       o: {
         id: null,
@@ -136,7 +134,7 @@ export default _.ui({
         });
       } else if (Number(id)) {
         axios
-          .get("/admin/desarrollo-social/api/people/" + id)
+          .get("/api/hr/employee/" + id)
           .then((response) => {
             var o = response.data;
             if (o.red) {
@@ -159,7 +157,6 @@ export default _.ui({
               m.addFeature({ draggable: true, lat: o.lat, lon: o.lon }, { zoom: 14 });
               me.trayLocation = 1;
             }
-            me.$refs.province.load({ code: o && o.region || '02' });
           });
       } else {
         try {
@@ -176,7 +173,6 @@ export default _.ui({
         } catch (e) {
           console.log(e);
         }
-        me.$refs.province.load({ code: me.o && me.o.region || '02' });
       }
     },
     close(r) {
@@ -190,8 +186,12 @@ export default _.ui({
       }
       var nid = o.tmpId ? -o.tmpId : o.id;
       if (me.id != nid)
-        me.$router.replace("/admin/desarrollo-social/people/" + nid);
-    }
+        me.$router.replace("/admin/hr/employee/" + nid);
+    },
+	view(){
+		let me=this;
+		me.$router.replace("/admin/hr/employee/" + me.o.id);
+	}
   },
 });
 </script>

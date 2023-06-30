@@ -1,19 +1,19 @@
 <template>
     <ion-content :scroll-events="true">
-        <v-form header="Experiencias" action="/admin/hr/experience">
+        <v-form header="Empleados" action="/admin/hr/employee">
             <v-table :selectable="true" row-style-class="row.synchronized?'green':(row.tmpId>0?'yellow':'')"
-                store="experience" @loaded="ll" :scrollable="true" rowKey="id" :pagination="20" @updated="app.bindLinks($el)"
-                :filters="filters" src="/api/hr/experience">
+                store="employee" @loaded="ll" :scrollable="true" rowKey="id" :pagination="20" @updated="app.bindLinks($el)"
+                :filters="filters" src="/api/hr/employee">
                 <template v-slot:header>
                     <v-button value="Enviar" v-if="app.connected" icon="fa-save" :disabled="!rowSelectedCount"
                         @click.prevent="sync"></v-button>
-                    <v-button value="Crear" v-if="1 || can(perms.HR_REGISTER_EXPERIENCE)" icon="fa-plus"
+                    <v-button value="Crear" v-if="1 || can(perms.HR_REGISTER_employee)" icon="fa-plus"
                         class="on" @click.prevent="create"></v-button>
-                    <v-button value="Editar" v-if="1 || can(perms.HR_REGISTER_EXPERIENCE)" icon="fa-pen"
+                    <v-button value="Editar" v-if="1 || can(perms.HR_REGISTER_employee)" icon="fa-pen"
                         @click.prevent="edit" :disabled="!rowSelectedCount"></v-button>
-                    <v-button value="Ver" icon="fa-search" @click.prevent="view(getSelected()[0])"
+                    <v-button value="Verj" icon="fa-search" @click.prevent="view(getSelected()[0])"
                         :disabled="!rowSelectedCount"></v-button>
-                    <v-button value="Eliminar" v-if="1 || can(perms.HR_REGISTER_EXPERIENCE)" icon="fa-trash"
+                    <v-button value="Eliminar" v-if="1 || can(perms.HR_REGISTER_employee)" icon="fa-trash"
                         @click.prevent="destroy" :disabled="!rowSelectedCount"></v-button>
                     <v-button title="Refrescar" icon="fa-sync" @click.prevent="refresh"></v-button>
                 </template>
@@ -24,30 +24,6 @@
                         </v-filter>
                         {{ pad(row.id, 4) }}
                     </td>
-                    <td width="220" header="Province" >
-                        <v-filter>
-                            <input v-model="filters.province" />
-                        </v-filter>
-                        {{ row.province }}
-                    </td>
-                    <td width="220" header="Establecimiento" >
-                        <v-filter>
-                            <input v-model="filters.establecimiento" />
-                        </v-filter>
-                        {{ row.establecimiento }}
-                    </td>
-                    <td width="220" header="CCPP" >
-                        <v-filter>
-                            <input v-model="filters.ccpp" />
-                        </v-filter>
-                        {{ row.ccpp }}
-                    </td>
-                    <td width="220" header="Dirección" >
-                        <v-filter>
-                            <input v-model="filters.direccion" />
-                        </v-filter>
-                        {{ row.direccion }}
-                    </td>
                     <td width="120" header="DNI" class="center" >
                         <v-filter>
                             <input v-model="filters.dni" class="center" />
@@ -56,35 +32,28 @@
                     </td>
                     <td width="320" header="Apellidos y Nombres" >
                         <v-filter>
-                            <input v-model="filters.apellidos_nombres" />
+                            <input v-model="filters.fullName" />
                         </v-filter>
-                        {{ row.apellidos_nombres }}
+                        {{ row.fullName }}
                     </td>
-                    <td width="120" header="Financiador" class="center">
-                        <v-filter>
-                            <input v-model="filters.financiador" />
-                        </v-filter>
-                        {{ row.financiador }}
-                    </td>
-                    
                     <td width="120" header="Telefono" class="center">
                         <v-filter>
-                            <input v-model="filters.telefono" />
+                            <input v-model="filters.phone" />
                         </v-filter>
-                        {{ row.telefono }}
+                        {{ row.phone }}
                     </td>
                     <td width="90" header="Fecha Nacimiento (Edad)" class="center">
                         <v-filter>
-                            <input v-model="filters.fecha_nacimiento" />
+                            <input v-model="filters.birthday" />
                         </v-filter>
-                        {{ row.fecha_nacimiento ||'---'}}
+                        {{ row.birthday ||'---'}}
                         <br/><template v-if="row.edad||row.edad==0">({{ row.edad }})</template>
                     </td>
                     <td width="70" header="Sexo" class="center">
                         <v-filter>
-                            <input v-model="filters.sexo" />
+                            <input v-model="filters.sex" />
                         </v-filter>
-                        {{ row.sexo }}
+                        {{ row.sex }}
                     </td>
                     <td width="140" header="Telefono Contacto" class="center">
                         <v-filter>
@@ -119,9 +88,9 @@ export default _.ui({
         var me = this;
         me.filters.uid = me.user.uid;
         me.$on('sync', function (dr, dl) {//data remote -> data local
-            if (dr.people && dl.people) {
-                dr.people.forEach(pr => {
-                    dl.people.forEach(pl => {
+            if (dr.employee && dl.employee) {
+                dr.employee.forEach(pr => {
+                    dl.employee.forEach(pl => {
                         if (pl.tmpId == pr.tmpId) {
                             if (pr.id) {
                                 pl.id = pr.id;
@@ -142,6 +111,7 @@ export default _.ui({
         this.app.bindLinks(this.$el);
     },
     methods: {
+		override(url){return '/admin'+url;},
         ll(e) { console.log(e) },
         rss(e) {
             e = e.selection;
@@ -155,7 +125,10 @@ export default _.ui({
         },
         toInt(o) {
             return Array.isArray(o) ? o.length : o;
-        }
+        },
+		view(o){
+			this.open('/admin/hr/employee/'+o.id);
+		}
     }
 });
 </script>

@@ -45,6 +45,9 @@
 				<ion-item href="/admin/hr/people">
 					<i class="fa fa-user"></i>Datos Personales
 				</ion-item>
+				<ion-item href="/admin/hr/employee">
+					<i class="fa fa-users"></i>Empleados
+				</ion-item>
 				<ion-item href="/admin/hr/study">
 					<i class="fa fa-graduation-cap"></i>Estudios
 				</ion-item>

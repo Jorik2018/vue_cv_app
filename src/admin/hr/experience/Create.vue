@@ -8,6 +8,10 @@
           : ''
     " store="experience">
     <div class="v-form">
+		<label>Empleado:</label>
+		<div><a :href="'/admin/hr/employee/'+o.employeeId"><template v-if="o.people">{{o.people.surnames}} {{o.people.names}}</template>
+		<template v-else>{{o.employeeId}}</template>
+		</a></div>
         <label>Entidad / Empresa:</label>
         <input v-model="o.entity"/>
         <label>Cargo:</label>
@@ -41,21 +45,22 @@ var { _, axios, ol } = window;
 ol.style.Icon = Icon;
 ol.style.Feature = Feature;
 export default _.ui({
-  props: ["id"],
-  data() {
-    return {
-      count: 0,
-      red: [],
-      age:null,
-      trayLocation: null,
-      o: {
-        id: null,
-        synchronized: null,
-        attachment:null,
-        tmpId: null
-      },
-    };
-  },
+	props: ["id","employee"],
+	data() {
+		return {
+			count: 0,
+			red: [],
+			age:null,
+			trayLocation: null,
+			o: {
+				id: null,
+				synchronized: null,
+				attachment:null,
+				tmpId: null,
+				employeeId:null
+			},
+		};
+	},
   computed: {
     filteredEvent() {
       return this.o.category != null
@@ -184,7 +189,7 @@ export default _.ui({
         } catch (e) {
           console.log(e);
         }
-        //me.$refs.province.load({ code: me.o && me.o.region || '02' });
+        me.o.employeeId=me.employee;
       }
     },
     close(r) {
